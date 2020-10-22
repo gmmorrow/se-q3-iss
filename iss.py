@@ -13,7 +13,7 @@ import requests
 astronauts = 'http://api.open-notify.org/astros.json'
 overhead_coordinates = 'http://api.open-notify.org/iss-pass.json'
 icon = 'iss.gif'
-map_giffy = 'map.gif'  
+indy_map = 'map.gif'  
 
 def astronaut_list(obj):
     text = json.dumps(obj, sort_keys=True, indent=4)
@@ -44,10 +44,15 @@ def current_geo_coords():
 
 def world_map(lat, lon):
     map = turtle.Screen()
-    map.setup(100)
-    map.bgpic(720, 360)
+    map.setup(720, 360)
+    map.bgpic(indy_map)
     map.setworldcoordinates(-180, -90, 180, 90)
     map.register_shape(icon)
+    iss = turtle.Turtle()
+    iss.shape(icon)
+    iss.setheading(90)
+    iss.penup()
+    iss.goto(lat, lon)
 
     return map
     
