@@ -7,40 +7,53 @@ import json
 import time
 import turtle
 import requests
-import urllib.request
 
 
-astronauts = requests.get("http://api.open-notify.org/astros.json")
 
+astronauts = 'http://api.open-notify.org/astros.json'
+overhead_coordinates = 'http://api.open-notify.org/iss-pass.json'
+icon = 'iss.gif'
+map_giffy = 'map.gif'  
 
 def astronaut_list(obj):
     text = json.dumps(obj, sort_keys=True, indent=4)
     print(text)
-
-
-    astronaut_list(astronauts.json())
+    r = requests.get('astronauts')
+    r.raise_for_status
+    return r.text()['people']
     
+    
+def current_geo_coords():
+    coordinates ='http://api.open-notify.org/iss-now.json'
     parameters = {
         "lat": -4.2196,
         "lon": 170.6524
     }
-    coordinates = requests.get(
-    "http://api.open-notify.org/iss-now.json", params=parameters)
-    astronaut_list(coordinates.json())
-    return (coordinates, astronauts)
+    r = requests.get(coordinates, params=parameters)
+    r.raise_for_status()
+    timestamp = r.json()['timestamp']
+    coordinates = r.json()['iss_position']
+    lat = float(coordinates['latitude'])
+    lon = float(coordinates['longitude'])
+    return time.ctime(timestamp), lat, lon
+
+    
+    # astronaut_list(coordinates.json())
+    # return (coordinates, astronauts)
 
 
-def world_map(turtle):
-    turtle.Screen()
-    turtle.setup(100)
-    turtle.bgpic(90)
-    turtle.setworldcoordinates(100)
+def world_map(lat, lon):
+    map = turtle.Screen()
+    map.setup(100)
+    map.bgpic(720, 360)
+    map.setworldcoordinates(-180, -90, 180, 90)
+    map.register_shape(icon)
+
+    return map
     
 
 
-    
-    
-    
+
 
 # def main():
 #     world_map()
