@@ -7,30 +7,22 @@ import json
 import time
 import turtle
 import requests
-
+import urllib.request
 
 
 astronauts = 'http://api.open-notify.org/astros.json'
 current_coords = 'http://api.open-notify.org/iss-now.json'
-overhead_coordinates = 'http://api.open-notify.org/iss-pass.json'
-icon = 'iss.gif'
-indy_map = 'map.gif'  
+overhead_coordinates = 'http://api.open-notify.org/iss-pass.json'  
 
-def astronaut_list(obj):
-    text = json.dumps(obj, sort_keys=True, indent=4)
-    print(text)
-    r = requests.get('astronauts')
+
+def astronaut_list():
+    r = requests.get(astronauts)
     r.raise_for_status
-    return r.text()['people']
+    return r.json()['people']
     
     
-def current_geo_coords():
-    current_coords = 'http://api.open-notify.org/iss-now.json'
-    parameters = {
-        "lat": -4.2196,
-        "lon": 170.6524
-    }
-    r = requests.get(current_coords, params=parameters)
+def current_geo_coords():    
+    r = requests.get(current_coords)
     r.raise_for_status()
     timestamp = r.json()['timestamp']
     coordinates = r.json()['iss_position']
@@ -43,26 +35,23 @@ def current_geo_coords():
     # return (coordinates, astronauts)
 
 
-def world_map(lat, long):
-    map = turtle.Screen()
-    map.setup(width=720, height=360)
-    map.bgpic(indy_map)
-    map.setworldcoordinates(-180, -90, 180, 90)
-    map.register_shape(icon)
+def world_map(lon, lat):
+    screen = turtle.Screen()
+    screen.setup(width=720, height=360)
+    screen.bgpic('map.gif')
+    screen.setworldcoordinates(-180, -90, 180, 90)
+    screen.register_shape('iss.gif')
     iss = turtle.Turtle()
-    iss.shape(icon)
+    iss.shape('iss.gif')
     iss.setheading(90)
     iss.penup()
-    iss.goto(lat, long)
+    iss.goto(lon, lat)
 
-    return map
+    return screen
 
 
 def overhead_indy(lat, long):
-    parameters = {
-        "lat": 39.7684,
-        "long": 86.1581
-    }
+    parameters = {"lat": lat, "lon": long}
     r = requests.get(overhead_coordinates, params=parameters)
     r.raise_for_status()
     time = r.json()['response'][1]['risetime']
@@ -80,8 +69,10 @@ def overhead_indy(lat, long):
 
 
 def main():
+    # print('People in Space', result['number'])
+    print(f'Current  astronauts in space: {len(astronauts)}')
     for astro in astronauts:
-        print(astro.json)
+        print('* {} in {}'.format(astro['name'], astro['craft']))
 
     current_iss_info = current_geo_coords()
     timestamp = current_iss_info[0]
